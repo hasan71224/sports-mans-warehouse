@@ -47,18 +47,18 @@ async function run() {
 
         //POST
         app.post('/item', async (req, res) => {
-            const newService = req.body;
-            const result = await serviceCollection.insertOne(newService);
+            const newitem = req.body;
+            const result = await itemCollection.insertOne(newitem);
             res.send(result)
         })
 
         // //DELETE
-        // app.delete('/service/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const query = { _id: ObjectId(id) };
-        //     const result = await serviceCollection.deleteOne(query);
-        //     res.send(result)
-        // })
+        app.delete('/item/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await itemCollection.deleteOne(query);
+            res.send(result)
+        })
 
         // //order collection API
         // app.get('/order', verifyJWT, async (req, res) => {
