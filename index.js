@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 
 //middleware
-app.use(cors());
+app.use(cors);
 app.use(express.json())
 
 function verifyJWT(req, res, next) {
@@ -55,9 +55,9 @@ async function run() {
             res.send(item)
         })
 
-        app.get('/item/:id', async(req, res) => {
+        app.get('/item/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: ObjectId(id)};
+            const query = { _id: ObjectId(id) };
             const item = await itemCollection.findOne(query);
             res.send(item)
         })
@@ -82,21 +82,44 @@ async function run() {
             const decocedEmail = req.decoded.email;
             const email = req.query.email;
             if (email === decocedEmail) {
-                const query = {email:email}
+                const query = { email: email }
                 const cursor = productCollection.find(query);
                 const products = await cursor.toArray();
                 res.send(products)
             }
-            else{
-                res.status(403).send({message: 'forbidden access'})
+            else {
+                res.status(403).send({ message: 'forbidden access' })
             }
         })
 
-        // app.post('/item', async (req, res) => {
-        //     const order = req.body;
-        //     const result = await orderCollection.insertOne(order);
-        //     res.send(result)
-        // })
+        // update data
+        app.patch('/item/:id', async (req, res) => {
+            const item = req.body;
+            const id = req.params.id;
+            
+            const filter = {_id: ObjectId(id)};
+            const options = {update: true};
+            const updateDoc = {
+                $set: {
+                    ...item,
+                },
+            };
+            // const result = await itemCollection.updateOne(
+            //     filter,
+            //     updateDoc,
+            //     options
+            // );
+
+            const result = await itemCollection.findOneAndUpdate(
+                {_id: id},
+                req.body,
+                {new: true}
+            )
+            if (!result) {
+                throw new Error(`No item with id: ${id}`)
+            }
+            res.send(result)
+        })
 
 
     }
